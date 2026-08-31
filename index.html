@@ -14,240 +14,489 @@
           colors: {
             brand: '#6366f1',
             accent: '#8b5cf6',
-            cardBg: 'rgba(18, 18, 24, 0.7)',
+            darkBg: '#08080c',
+            cardBg: 'rgba(18, 18, 24, 0.75)',
           },
           boxShadow: {
-            'glow': '0 0 40px -10px rgba(99, 102, 241, 0.3)',
-            'glow-cyan': '0 0 40px -10px rgba(6, 182, 212, 0.3)',
+            'glow': '0 0 40px -10px rgba(99, 102, 241, 0.35)',
+            'glow-cyan': '0 0 40px -10px rgba(6, 182, 212, 0.35)',
           }
         }
       }
     }
   </script>
 
+  <!-- Three.js CDN for 3D Particle Wave -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
   <!-- Vanilla Tilt (3D Card Physics) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
 
-  <!-- Spline 3D Viewer -->
-  <script type="module" src="https://unpkg.com/@splinetool/viewer@latest/build/spline-viewer.js"></script>
-
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
   <style>
     body { 
       font-family: 'Plus Jakarta Sans', sans-serif; 
-      background-image: 
-        radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 85% 60%, rgba(139, 92, 246, 0.1) 0%, transparent 40%),
-        radial-gradient(circle at 50% 90%, rgba(6, 182, 212, 0.08) 0%, transparent 50%);
+      background-color: #08080c;
     }
     .mono { font-family: 'JetBrains Mono', monospace; }
-    spline-viewer::part(watermark) { display: none !important; }
     
-    /* 3D Glassmorphic Card Border */
+    /* 3D Glassmorphic Cards */
     .glass-card {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     .glass-card:hover {
-      border: 1px solid rgba(99, 102, 241, 0.4);
-      box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.25);
+      border: 1px solid rgba(99, 102, 241, 0.45);
+      box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.3);
     }
 
-    /* Custom Scrollbar for 3D Filmstrip */
+    /* Filmstrip Custom Scrollbar */
     .filmstrip::-webkit-scrollbar { height: 6px; }
     .filmstrip::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 99px; }
     .filmstrip::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.4); border-radius: 99px; }
+
+    /* 3D Deck / Stack Perspective */
+    .deck-container {
+      perspective: 1000px;
+    }
+    .deck-card {
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transform-style: preserve-3d;
+    }
   </style>
 </head>
 <body class="selection:bg-brand selection:text-white overflow-x-hidden">
 
   <!-- Header -->
-  <header class="fixed top-0 left-0 w-full z-50 backdrop-blur-xl bg-[#08080c]/60 border-b border-white/5">
-    <div class="max-w-7xl mx-auto px-6 h-18 py-4 flex items-center justify-between">
+  <header class="fixed top-0 left-0 w-full z-50 backdrop-blur-xl bg-[#08080c]/70 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-18 py-4 flex items-center justify-between">
       <a href="#top" class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
         <span class="w-2.5 h-2.5 rounded-full bg-brand animate-ping"></span>
         Code<span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Flux</span>.in
       </a>
       <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
-        <a href="#services" class="hover:text-white transition">Capabilities</a>
+        <a href="#packages" class="hover:text-white transition">Packages</a>
         <a href="#work" class="hover:text-white transition">Launches</a>
+        <a href="#clients" class="hover:text-white transition">Built For</a>
         <a href="#process" class="hover:text-white transition">Process</a>
-        <a href="#contact" class="hover:text-white transition">Contact</a>
       </nav>
       <div class="flex items-center gap-3">
         <a href="admin.html" class="mono text-xs text-zinc-500 hover:text-zinc-300 transition hidden sm:inline-block">/admin</a>
         <a href="#contact" class="glass-card text-white hover:bg-brand transition text-xs font-semibold px-4 py-2.5 rounded-full border border-white/10 shadow-glow">
-          Start Project
+          Get a quote
         </a>
       </div>
     </div>
   </header>
 
   <main id="top">
-    <!-- Hero Section with Interactive 3D -->
-    <section class="relative min-h-screen flex flex-col md:flex-row items-center justify-center max-w-7xl mx-auto px-6 pt-24 pb-12 gap-10">
+    <!-- Hero Section with 3D Interactive Dot-Matrix Wave -->
+    <section class="relative min-h-[95vh] flex flex-col justify-center items-center text-center px-6 pt-24 pb-16 overflow-hidden">
       
-      <!-- Text -->
-      <div class="w-full md:w-1/2 z-10 text-left">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-card text-indigo-300 text-xs font-semibold mono uppercase tracking-wider mb-6">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Available for New Contracts
+      <!-- 3D ThreeJS Background Canvas -->
+      <canvas id="hero-3d-canvas" class="absolute inset-0 w-full h-full pointer-events-auto z-0 opacity-70"></canvas>
+
+      <!-- Ambient Glow Behind Text -->
+      <div class="absolute w-[500px] h-[500px] bg-indigo-600/15 rounded-full blur-3xl pointer-events-none z-0"></div>
+
+      <!-- Hero Content -->
+      <div class="relative z-10 max-w-3xl mx-auto mt-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-card text-indigo-300 text-xs font-semibold mono uppercase tracking-wider mb-6">
+          <span class="w-2 h-2 rounded-full bg-brand animate-pulse"></span> Web Engineering & Custom Systems
         </div>
-        
+
         <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.08]">
-          Big-studio <br/>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-300 to-cyan-400">Engineering.</span><br/>
-          Direct agility.
+          <span>Big-studio</span> <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-300 to-cyan-400">websites.</span><br/>
+          <span>Small-business</span> prices.
         </h1>
-        
-        <p class="mt-6 text-zinc-400 text-base sm:text-lg leading-relaxed max-w-xl">
-          High-performance web applications, custom e-commerce engines, and real-time operational dashboards crafted from scratch.
+
+        <p class="mt-6 text-zinc-400 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
+          Affordable, high-performance web applications, e-commerce platforms, clinics, and management systems — designed, built, and launched for you in days, not months.
         </p>
 
-        <div class="mt-8 flex flex-wrap items-center gap-4">
+        <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
           <a href="#work" class="bg-white text-black font-bold px-7 py-3.5 rounded-xl hover:bg-zinc-200 transition text-sm shadow-xl">
-            Explore Launches
+            View my work
           </a>
-          <a href="#contact" class="glass-card text-zinc-300 font-semibold px-6 py-3.5 rounded-xl hover:text-white transition text-sm">
-            Request Fixed Quote
+          <a href="#contact" class="glass-card text-zinc-200 font-semibold px-6 py-3.5 rounded-xl hover:text-white transition text-sm">
+            Get a free quote
           </a>
         </div>
-      </div>
 
-      <!-- 3D Interactive WebGL Element -->
-      <div class="w-full md:w-1/2 h-[380px] sm:h-[500px] relative rounded-3xl overflow-hidden glass-card shadow-glow">
-        <spline-viewer url="https://prod.spline.design/6Wq1Q7YGyM-mab6X/scene.splinecode" class="w-full h-full"></spline-viewer>
-      </div>
-    </section>
-
-    <!-- Capabilities / What I Build -->
-    <section id="services" class="max-w-7xl mx-auto px-6 py-28 border-t border-white/5">
-      <p class="mono text-brand font-semibold text-xs tracking-widest uppercase mb-2">(01) — Capabilities</p>
-      <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-14">Architecture & Builds</h2>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- 3D Tilt Card 1 -->
-        <div class="glass-card p-8 rounded-3xl transition duration-300" data-tilt data-tilt-max="12" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2">
-          <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-xl mb-6">⚡</div>
-          <h3 class="text-xl font-bold text-white mb-2">Custom E-Commerce</h3>
-          <p class="text-zinc-400 text-sm leading-relaxed">High-converting digital storefronts, multi-image product presentations, custom checkout flows, and automated tracking webhooks.</p>
-        </div>
-
-        <!-- 3D Tilt Card 2 -->
-        <div class="glass-card p-8 rounded-3xl transition duration-300" data-tilt data-tilt-max="12" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2">
-          <div class="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-xl mb-6">📊</div>
-          <h3 class="text-xl font-bold text-white mb-2">Live Admin Dashboards</h3>
-          <p class="text-zinc-400 text-sm leading-relaxed">Real-time inventory controllers, live order status feeds, and role-based operational dashboards powered by Supabase & Firebase.</p>
-        </div>
-
-        <!-- 3D Tilt Card 3 -->
-        <div class="glass-card p-8 rounded-3xl transition duration-300" data-tilt data-tilt-max="12" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2">
-          <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-xl mb-6">🌐</div>
-          <h3 class="text-xl font-bold text-white mb-2">High-Performance Portfolios</h3>
-          <p class="text-zinc-400 text-sm leading-relaxed">Lightning-fast responsive experiences for clinics, interior designers, coaching institutes, and growing brand businesses.</p>
+        <div class="mt-12 flex items-center justify-center gap-2 mono text-xs text-zinc-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Available for new projects
         </div>
       </div>
     </section>
 
-    <!-- 3D Horizontal Filmstrip Gallery for Recent Launches -->
-    <section id="work" class="max-w-7xl mx-auto px-6 py-28 border-t border-white/5">
-      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10">
+    <!-- (01) What I Build / 3D Interactive Packages Deck -->
+    <section id="packages" class="max-w-6xl mx-auto px-6 py-24 border-t border-white/5">
+      <div class="text-left mb-12">
+        <p class="mono text-brand font-semibold text-xs tracking-widest uppercase mb-2">(01) — What I build</p>
+        <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Website Packages</h2>
+        <p class="text-zinc-400 text-sm mt-2">Fixed quote before we start — no hourly billing, no surprise extras.</p>
+      </div>
+
+      <!-- 3D Overlapping Card Deck -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 deck-container">
+        
+        <!-- Package 1: Landing Page -->
+        <div class="glass-card p-8 rounded-3xl deck-card" data-tilt data-tilt-max="10" data-tilt-speed="400">
+          <span class="mono text-xs text-indigo-400 uppercase tracking-wider font-semibold">Package • 01</span>
+          <h3 class="text-2xl font-bold text-white mt-2 mb-1">Landing Page + Booking</h3>
+          <p class="text-zinc-400 text-xs mb-6">High-converting single page for direct inquiries & bookings.</p>
+          
+          <div class="h-40 rounded-2xl bg-gradient-to-br from-indigo-950/80 to-purple-900/40 border border-white/10 p-4 flex flex-col justify-between mb-6">
+            <div class="flex justify-between items-center">
+              <span class="mono text-xs text-indigo-300">Fast Delivery</span>
+              <span class="text-xs bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full mono">3-5 Days</span>
+            </div>
+            <div class="mono font-bold text-lg text-white">Full Responsive</div>
+          </div>
+
+          <ul class="text-xs text-zinc-300 space-y-2 mb-6 mono">
+            <li class="flex items-center gap-2">✓ Modern 3D & Tilt Interactions</li>
+            <li class="flex items-center gap-2">✓ WhatsApp & Direct Call Flow</li>
+            <li class="flex items-center gap-2">✓ High-speed Vercel Edge Hosting</li>
+          </ul>
+
+          <a href="#contact" class="block w-full py-3 rounded-xl bg-white/5 hover:bg-brand text-center text-xs font-bold transition">Select Package</a>
+        </div>
+
+        <!-- Package 2: Full Business Platform -->
+        <div class="glass-card p-8 rounded-3xl deck-card border-indigo-500/40 relative" data-tilt data-tilt-max="10" data-tilt-speed="400">
+          <div class="absolute -top-3 right-6 bg-brand text-white mono text-[10px] font-bold uppercase px-3 py-1 rounded-full">Most Popular</div>
+          <span class="mono text-xs text-indigo-400 uppercase tracking-wider font-semibold">Package • 02</span>
+          <h3 class="text-2xl font-bold text-white mt-2 mb-1">Full Business Platform</h3>
+          <p class="text-zinc-400 text-xs mb-6">Multi-page website with dynamic catalog & showcase.</p>
+          
+          <div class="h-40 rounded-2xl bg-gradient-to-br from-purple-950/80 to-indigo-900/40 border border-white/10 p-4 flex flex-col justify-between mb-6">
+            <div class="flex justify-between items-center">
+              <span class="mono text-xs text-purple-300">Comprehensive</span>
+              <span class="text-xs bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full mono">7-10 Days</span>
+            </div>
+            <div class="mono font-bold text-lg text-white">Multi-Page System</div>
+          </div>
+
+          <ul class="text-xs text-zinc-300 space-y-2 mb-6 mono">
+            <li class="flex items-center gap-2">✓ Custom Project/Product Showcase</li>
+            <li class="flex items-center gap-2">✓ Google Business & SEO Setup</li>
+            <li class="flex items-center gap-2">✓ 30 Days Post-Launch Support</li>
+          </ul>
+
+          <a href="#contact" class="block w-full py-3 rounded-xl bg-brand hover:bg-indigo-500 text-center text-xs font-bold transition shadow-glow">Select Package</a>
+        </div>
+
+        <!-- Package 3: Custom E-Commerce & Dashboard -->
+        <div class="glass-card p-8 rounded-3xl deck-card" data-tilt data-tilt-max="10" data-tilt-speed="400">
+          <span class="mono text-xs text-indigo-400 uppercase tracking-wider font-semibold">Package • 03</span>
+          <h3 class="text-2xl font-bold text-white mt-2 mb-1">E-Commerce + Admin Panel</h3>
+          <p class="text-zinc-400 text-xs mb-6">Complete web app with live admin management controls.</p>
+          
+          <div class="h-40 rounded-2xl bg-gradient-to-br from-cyan-950/80 to-indigo-950/40 border border-white/10 p-4 flex flex-col justify-between mb-6">
+            <div class="flex justify-between items-center">
+              <span class="mono text-xs text-cyan-300">Custom Engine</span>
+              <span class="text-xs bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full mono">10-14 Days</span>
+            </div>
+            <div class="mono font-bold text-lg text-white">Live Admin & DB</div>
+          </div>
+
+          <ul class="text-xs text-zinc-300 space-y-2 mb-6 mono">
+            <li class="flex items-center gap-2">✓ Firebase / Supabase Live Backend</li>
+            <li class="flex items-center gap-2">✓ Private Admin Control Panel</li>
+            <li class="flex items-center gap-2">✓ Order & Customer Tracking Flow</li>
+          </ul>
+
+          <a href="#contact" class="block w-full py-3 rounded-xl bg-white/5 hover:bg-brand text-center text-xs font-bold transition">Select Package</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- (02) Recent Launches / 3D Filmstrip Slider (Firebase Synced) -->
+    <section id="work" class="max-w-6xl mx-auto px-6 py-24 border-t border-white/5">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8">
         <div>
           <p class="mono text-brand font-semibold text-xs tracking-widest uppercase mb-2">(02) — Work Samples</p>
-          <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Recent Launches</h2>
+          <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Recent launches.</h2>
+          <p class="text-zinc-400 text-xs mt-2">Drag the strip or swipe — preview cards bring real case studies into focus.</p>
         </div>
-        <p class="text-xs text-zinc-500 mono mt-3 sm:mt-0">Swipe / Scroll horizontally ➔</p>
+        <p class="text-xs text-zinc-500 mono mt-3 sm:mt-0">Swipe sideways ➔</p>
       </div>
 
-      <!-- Filmstrip Container (Syncs with Firebase) -->
+      <!-- Live Dynamic Filmstrip Container -->
       <div id="projects-container" class="filmstrip flex gap-6 overflow-x-auto pb-8 pt-2 snap-x snap-mandatory">
-        <!-- Default Starter Project 1 -->
-        <div class="glass-card min-w-[320px] sm:min-w-[420px] rounded-3xl p-6 snap-start flex-shrink-0" data-tilt data-tilt-max="8">
-          <div class="h-52 w-full rounded-2xl bg-gradient-to-tr from-indigo-950/60 to-purple-900/30 border border-white/5 flex items-center justify-center relative overflow-hidden mb-6">
-            <span class="mono text-xs text-indigo-300 bg-black/60 px-3 py-1.5 rounded-full border border-white/10">Full-Stack Platform</span>
+        <!-- Default Launch Card 1 -->
+        <div class="glass-card min-w-[300px] sm:min-w-[380px] rounded-3xl p-6 snap-start flex-shrink-0" data-tilt data-tilt-max="8">
+          <div class="h-48 w-full rounded-2xl bg-gradient-to-tr from-indigo-950/80 to-purple-900/40 border border-white/5 flex items-center justify-center relative overflow-hidden mb-5">
+            <span class="mono text-xs text-indigo-300 bg-black/60 px-3 py-1.5 rounded-full border border-white/10">Ayursiddhit Naturals</span>
           </div>
-          <span class="mono text-xs text-indigo-400 font-semibold uppercase">E-Commerce & Tracking</span>
-          <h3 class="text-2xl font-bold text-white mt-1 mb-2">Automated Store Engine</h3>
-          <p class="text-zinc-400 text-sm leading-relaxed">Engineered with custom checkout, webhook dispatching, and dynamic inventory feeds.</p>
+          <span class="mono text-xs text-indigo-400 font-semibold uppercase">E-Commerce & Brand</span>
+          <h3 class="text-xl font-bold text-white mt-1 mb-2">Ayursiddhit Naturals Store</h3>
+          <p class="text-zinc-400 text-xs leading-relaxed">Full natural skincare catalog, automated order notifications, and backend tracking panel.</p>
         </div>
 
-        <!-- Default Starter Project 2 -->
-        <div class="glass-card min-w-[320px] sm:min-w-[420px] rounded-3xl p-6 snap-start flex-shrink-0" data-tilt data-tilt-max="8">
-          <div class="h-52 w-full rounded-2xl bg-gradient-to-tr from-cyan-950/60 to-indigo-900/30 border border-white/5 flex items-center justify-center relative overflow-hidden mb-6">
-            <span class="mono text-xs text-cyan-300 bg-black/60 px-3 py-1.5 rounded-full border border-white/10">Real-Time App</span>
+        <!-- Default Launch Card 2 -->
+        <div class="glass-card min-w-[300px] sm:min-w-[380px] rounded-3xl p-6 snap-start flex-shrink-0" data-tilt data-tilt-max="8">
+          <div class="h-48 w-full rounded-2xl bg-gradient-to-tr from-purple-950/80 to-indigo-950/40 border border-white/5 flex items-center justify-center relative overflow-hidden mb-5">
+            <span class="mono text-xs text-purple-300 bg-black/60 px-3 py-1.5 rounded-full border border-white/10">Khaugulya App</span>
           </div>
-          <span class="mono text-xs text-cyan-400 font-semibold uppercase">Order Tracking Engine</span>
-          <h3 class="text-2xl font-bold text-white mt-1 mb-2">Live Status Dispatcher</h3>
-          <p class="text-zinc-400 text-sm leading-relaxed">Real-time status updates, push notifications, and administrative override console.</p>
+          <span class="mono text-xs text-purple-400 font-semibold uppercase">Web Application</span>
+          <h3 class="text-xl font-bold text-white mt-1 mb-2">Live Order Tracker</h3>
+          <p class="text-zinc-400 text-xs leading-relaxed">Real-time order tracker with instant status updates and management controls.</p>
+        </div>
+
+        <!-- Default Launch Card 3 -->
+        <div class="glass-card min-w-[300px] sm:min-w-[380px] rounded-3xl p-6 snap-start flex-shrink-0" data-tilt data-tilt-max="8">
+          <div class="h-48 w-full rounded-2xl bg-gradient-to-tr from-cyan-950/80 to-indigo-900/40 border border-white/5 flex items-center justify-center relative overflow-hidden mb-5">
+            <span class="mono text-xs text-cyan-300 bg-black/60 px-3 py-1.5 rounded-full border border-white/10">Karvi Komfy</span>
+          </div>
+          <span class="mono text-xs text-cyan-400 font-semibold uppercase">Management Console</span>
+          <h3 class="text-xl font-bold text-white mt-1 mb-2">Store Management System</h3>
+          <p class="text-zinc-400 text-xs leading-relaxed">Admin dashboard with secure image upload flows and dynamic inventory management.</p>
         </div>
       </div>
     </section>
 
-    <!-- Process -->
-    <section id="process" class="max-w-7xl mx-auto px-6 py-28 border-t border-white/5">
-      <p class="mono text-brand font-semibold text-xs tracking-widest uppercase mb-2">(03) — Methodology</p>
-      <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-14">From Architecture to Production</h2>
+    <!-- (03) Who I Work With / Pill Tags -->
+    <section id="clients" class="max-w-6xl mx-auto px-6 py-24 border-t border-white/5">
+      <p class="mono text-brand font-semibold text-xs tracking-widest uppercase mb-2">(03) — Who I work with</p>
+      <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-8">Built for local businesses.</h2>
+      
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+        <div class="glass-card py-4 px-6 rounded-2xl flex items-center gap-3"><span class="text-lg">🩺</span><span class="font-bold text-sm">Clinics</span></div>
+        <div class="glass-card py-4 px-6 rounded-2xl flex items-center gap-3"><span class="text-lg">📚</span><span class="font-bold text-sm">Coaching Classes</span></div>
+        <div class="glass-card py-4 px-6 rounded-2xl flex items-center gap-3"><span class="text-lg">🏋️</span><span class="font-bold text-sm">Gyms & Fitness</span></div>
+        <div class="glass-card py-4 px-6 rounded-2xl flex items-center gap-3"><span class="text-lg">🏠</span><span class="font-bold text-sm">Interior Designers</span></div>
+        <div class="glass-card py-4 px-6 rounded-2xl flex items-center gap-3"><span class="text-lg">🛋️</span><span class="font-bold text-sm">Furniture Stores</span></div>
+        <div class="glass-card py-4 px-6 rounded-2xl flex items-center gap-3"><span class="text-lg">☕</span><span class="font-bold text-sm">Cafes & Salons</span></div>
+      </div>
+
+      <p class="text-zinc-400 text-xs leading-relaxed max-w-xl">
+        If your business deals with walk-in or appointment customers, a website will pay for itself — whatever the industry.
+      </p>
+    </section>
+
+    <!-- (04) How It Works -->
+    <section id="process" class="max-w-6xl mx-auto px-6 py-24 border-t border-white/5">
+      <p class="mono text-brand font-semibold text-xs tracking-widest uppercase mb-2">(04) — How it works</p>
+      <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-12">From call to launch.</h2>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div class="glass-card p-6 rounded-2xl">
-          <span class="mono text-brand font-bold text-xl">01</span>
-          <h3 class="text-white font-bold text-lg mt-3">Discovery</h3>
-          <p class="text-zinc-400 text-xs mt-2 leading-relaxed">System requirements, UX mapping, database schema design, and technical scoping.</p>
+          <span class="mono text-brand font-bold text-lg">01</span>
+          <h3 class="text-white font-bold text-base mt-2">Call</h3>
+          <p class="text-zinc-400 text-xs mt-2 leading-relaxed">A free 15-minute call to understand your business, customers, and what the site needs to do.</p>
         </div>
         <div class="glass-card p-6 rounded-2xl">
-          <span class="mono text-brand font-bold text-xl">02</span>
-          <h3 class="text-white font-bold text-lg mt-3">Fixed Scope</h3>
-          <p class="text-zinc-400 text-xs mt-2 leading-relaxed">Defined milestone timelines and transparent fixed quotation with no surprise billing.</p>
+          <span class="mono text-brand font-bold text-lg">02</span>
+          <h3 class="text-white font-bold text-base mt-2">Quote</h3>
+          <p class="text-zinc-400 text-xs mt-2 leading-relaxed">A fixed price and timeline in writing. No hourly billing, no surprise extras later.</p>
         </div>
         <div class="glass-card p-6 rounded-2xl">
-          <span class="mono text-brand font-bold text-xl">03</span>
-          <h3 class="text-white font-bold text-lg mt-3">Development</h3>
-          <p class="text-zinc-400 text-xs mt-2 leading-relaxed">Clean modern code with private stage previews for continuous feature verification.</p>
+          <span class="mono text-brand font-bold text-lg">03</span>
+          <h3 class="text-white font-bold text-base mt-2">Build</h3>
+          <p class="text-zinc-400 text-xs mt-2 leading-relaxed">You get a preview link within days and follow progress as each section comes alive.</p>
         </div>
         <div class="glass-card p-6 rounded-2xl">
-          <span class="mono text-brand font-bold text-xl">04</span>
-          <h3 class="text-white font-bold text-lg mt-3">Launch</h3>
-          <p class="text-zinc-400 text-xs mt-2 leading-relaxed">Vercel high-speed edge deployment, DNS routing, and post-launch maintenance.</p>
+          <span class="mono text-brand font-bold text-lg">04</span>
+          <h3 class="text-white font-bold text-base mt-2">Launch</h3>
+          <p class="text-zinc-400 text-xs mt-2 leading-relaxed">Domain, hosting, and Google Business sorted for you, with 30 days of free support.</p>
         </div>
       </div>
     </section>
 
-    <!-- Contact CTA -->
-    <section id="contact" class="max-w-7xl mx-auto px-6 py-28 border-t border-white/5">
-      <div class="glass-card p-10 sm:p-16 rounded-3xl text-center max-w-3xl mx-auto shadow-glow">
-        <p class="mono text-brand font-semibold text-xs tracking-widest uppercase mb-3">Direct Engagement</p>
-        <h2 class="text-3xl sm:text-5xl font-extrabold text-white mb-6">Ready to launch your project?</h2>
-        <p class="text-zinc-400 text-sm sm:text-base mb-10 max-w-xl mx-auto">
-          Get in touch directly via WhatsApp or Email with your project details for honest technical guidance and an immediate quote.
-        </p>
+    <!-- (05) Get In Touch / Contact Builder -->
+    <section id="contact" class="max-w-6xl mx-auto px-6 py-24 border-t border-white/5">
+      <p class="mono text-brand font-semibold text-xs tracking-widest uppercase mb-2">(05) — Get in touch</p>
+      <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-12">Tell me about your business.</h2>
 
-        <div class="flex flex-col sm:flex-row justify-center gap-4">
-          <a href="https://wa.me/91XXXXXXXXXX" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8 py-4 rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-lg">
-            💬 WhatsApp Direct
-          </a>
-          <a href="mailto:your-email@gmail.com" class="glass-card hover:bg-white/10 text-white font-bold px-8 py-4 rounded-xl transition text-sm flex items-center justify-center gap-2">
-            ✉️ Email Inquiries
-          </a>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+        
+        <!-- Direct Channels -->
+        <div>
+          <p class="text-zinc-400 text-sm leading-relaxed mb-6">
+            One message is all it takes. Tell me what you do and what you need — I'll reply with honest advice, even if we don't end up working together.
+          </p>
+
+          <div class="space-y-4">
+            <a href="https://wa.me/918668388677" target="_blank" class="glass-card p-5 rounded-2xl flex items-center justify-between hover:border-emerald-500/50 transition group">
+              <div class="flex items-center gap-4">
+                <span class="text-2xl">💬</span>
+                <div>
+                  <div class="mono text-[10px] text-emerald-400 font-bold uppercase">WhatsApp</div>
+                  <div class="text-sm font-bold text-white group-hover:text-emerald-300 transition">+91 86683 88677</div>
+                </div>
+              </div>
+              <span class="mono text-xs text-zinc-500">Instant ↗</span>
+            </a>
+
+            <a href="tel:+919511618007" class="glass-card p-5 rounded-2xl flex items-center justify-between hover:border-indigo-500/50 transition group">
+              <div class="flex items-center gap-4">
+                <span class="text-2xl">📞</span>
+                <div>
+                  <div class="mono text-[10px] text-indigo-400 font-bold uppercase">Call Direct</div>
+                  <div class="text-sm font-bold text-white group-hover:text-indigo-300 transition">+91 95116 18007</div>
+                </div>
+              </div>
+              <span class="mono text-xs text-zinc-500">Call ↗</span>
+            </a>
+
+            <a href="mailto:codeflux.in@gmail.com" class="glass-card p-5 rounded-2xl flex items-center justify-between hover:border-purple-500/50 transition group">
+              <div class="flex items-center gap-4">
+                <span class="text-2xl">✉️</span>
+                <div>
+                  <div class="mono text-[10px] text-purple-400 font-bold uppercase">Email Inquiries</div>
+                  <div class="text-sm font-bold text-white group-hover:text-purple-300 transition">codeflux.in@gmail.com</div>
+                </div>
+              </div>
+              <span class="mono text-xs text-zinc-500">Send ↗</span>
+            </a>
+          </div>
+
+          <div class="mt-6 flex items-center gap-2 mono text-xs text-zinc-500">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Replies within a few hours, 7 days a week
+          </div>
         </div>
+
+        <!-- Interactive Quote Dispatcher -->
+        <div class="glass-card p-8 rounded-3xl">
+          <h3 class="text-lg font-bold text-white mb-4">Quick WhatsApp Message Builder</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="mono text-[11px] text-zinc-400 block mb-1">Your Name</label>
+              <input id="q-name" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:border-brand outline-none" placeholder="e.g. Rahul Sharma" />
+            </div>
+
+            <div>
+              <label class="mono text-[11px] text-zinc-400 block mb-1">Business Type</label>
+              <input id="q-type" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:border-brand outline-none" placeholder="e.g. Clinic / Furniture Store / Brand" />
+            </div>
+
+            <div>
+              <label class="mono text-[11px] text-zinc-400 block mb-1">What do you need?</label>
+              <textarea id="q-need" rows="3" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:border-brand outline-none" placeholder="e.g. I run a local clinic and need a simple site where patients can book appointments..."></textarea>
+            </div>
+
+            <button onclick="sendToWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl transition text-xs flex items-center justify-center gap-2">
+              Send directly via WhatsApp ➔
+            </button>
+          </div>
+        </div>
+
       </div>
     </section>
   </main>
 
   <footer class="border-t border-white/5 py-10 text-center mono text-xs text-zinc-600">
-    © 2026 CodeFlux.in — Engineered from scratch.
+    © 2026 CodeFlux.in — This page is my demo — designed & built from scratch.
   </footer>
 
-  <!-- Firebase Script to Automatically Sync Live Projects -->
+  <!-- 3D Interactive Dot Matrix Wave Engine (Three.js) -->
+  <script>
+    const canvas = document.getElementById('hero-3d-canvas');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+
+    function resize() {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Create 3D Dot Matrix Mesh
+    const SEPARATION = 45, AMOUNTX = 45, AMOUNTY = 45;
+    const numParticles = AMOUNTX * AMOUNTY;
+    const positions = new Float32Array(numParticles * 3);
+    const scales = new Float32Array(numParticles);
+
+    let i = 0, j = 0;
+    for (let ix = 0; ix < AMOUNTX; ix++) {
+      for (let iy = 0; iy < AMOUNTY; iy++) {
+        positions[i] = ix * SEPARATION - ((AMOUNTX * SEPARATION) / 2);
+        positions[i + 1] = 0;
+        positions[i + 2] = iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2);
+        scales[j] = 1;
+        i += 3;
+        j++;
+      }
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('scale', new THREE.BufferAttribute(scales, 1));
+
+    const material = new THREE.PointsMaterial({
+      color: 0x818cf8,
+      size: 3.2,
+      transparent: true,
+      opacity: 0.65,
+    });
+
+    const particles = new THREE.Points(geometry, material);
+    scene.add(particles);
+
+    camera.position.set(0, 320, 450);
+    camera.lookAt(0, 0, 0);
+
+    let mouseX = 0, mouseY = 0;
+    document.addEventListener('mousemove', (e) => {
+      mouseX = (e.clientX - window.innerWidth / 2) * 0.2;
+      mouseY = (e.clientY - window.innerHeight / 2) * 0.2;
+    });
+
+    let count = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      camera.position.x += (mouseX - camera.position.x) * 0.03;
+      camera.position.y += (-mouseY + 320 - camera.position.y) * 0.03;
+      camera.lookAt(0, 0, 0);
+
+      const positions = particles.geometry.attributes.position.array;
+      let i = 0;
+      for (let ix = 0; ix < AMOUNTX; ix++) {
+        for (let iy = 0; iy < AMOUNTY; iy++) {
+          positions[i + 1] = (Math.sin((ix + count) * 0.3) * 35) + (Math.sin((iy + count) * 0.5) * 35);
+          i += 3;
+        }
+      }
+      particles.geometry.attributes.position.needsUpdate = true;
+      count += 0.06;
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // WhatsApp Message Helper
+    function sendToWhatsApp() {
+      const name = document.getElementById('q-name').value || 'Client';
+      const type = document.getElementById('q-type').value || 'Business';
+      const need = document.getElementById('q-need').value || 'website development';
+      const msg = encodeURIComponent(`Hi CodeFlux, my name is ${name}. I run a ${type}. ${need}`);
+      window.open(`https://wa.me/918668388677?text=${msg}`, '_blank');
+    }
+  </script>
+
+  <!-- Live Firebase Project Sync with your exact credentials -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // Replace with your Firebase credentials when you set up Firebase
     const firebaseConfig = {
-      databaseURL: "https://YOUR-FIREBASE-PROJECT-default-rtdb.firebaseio.com"
+      apiKey: "AIzaSyDW95p_4YPfHo9vvTHwP07fAcrL20UDS7c",
+      authDomain: "codeflux-db.firebaseapp.com",
+      projectId: "codeflux-db",
+      storageBucket: "codeflux-db.firebasestorage.app",
+      messagingSenderId: "113608499003",
+      appId: "1:113608499003:web:e73b527a3a3afe1ec2211e"
     };
 
     try {
@@ -262,15 +511,15 @@
           container.innerHTML = '';
           Object.values(data).forEach(p => {
             const card = document.createElement('div');
-            card.className = "glass-card min-w-[320px] sm:min-w-[420px] rounded-3xl p-6 snap-start flex-shrink-0";
+            card.className = "glass-card min-w-[300px] sm:min-w-[380px] rounded-3xl p-6 snap-start flex-shrink-0";
             card.setAttribute('data-tilt', '');
             card.innerHTML = `
-              <div class="h-52 w-full rounded-2xl bg-zinc-900 border border-white/5 flex items-center justify-center relative overflow-hidden mb-6">
-                ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover"/>` : `<span class="mono text-xs text-indigo-300 bg-black/60 px-3 py-1.5 rounded-full">${p.badge || 'Launch'}</span>`}
+              <div class="h-48 w-full rounded-2xl bg-zinc-900 border border-white/5 flex items-center justify-center relative overflow-hidden mb-5">
+                ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover"/>` : `<span class="mono text-xs text-indigo-300 bg-black/60 px-3 py-1.5 rounded-full border border-white/10">${p.badge || 'Live Launch'}</span>`}
               </div>
               <span class="mono text-xs text-indigo-400 font-semibold uppercase">${p.category}</span>
-              <h3 class="text-2xl font-bold text-white mt-1 mb-2">${p.title}</h3>
-              <p class="text-zinc-400 text-sm leading-relaxed">${p.description}</p>
+              <h3 class="text-xl font-bold text-white mt-1 mb-2">${p.title}</h3>
+              <p class="text-zinc-400 text-xs leading-relaxed">${p.description}</p>
               ${p.link ? `<a href="${p.link}" target="_blank" class="inline-block mt-4 text-xs mono text-indigo-300 hover:text-white">Visit Live Site ↗</a>` : ''}
             `;
             container.appendChild(card);
@@ -279,10 +528,10 @@
         }
       });
     } catch (e) {
-      console.log("Firebase default fallback loaded.");
+      console.log("Fallback items loaded");
     }
 
-    // Initialize 3D tilt on default elements
+    // Initialize 3D tilt effects
     VanillaTilt.init(document.querySelectorAll("[data-tilt]"));
   </script>
 </body>
