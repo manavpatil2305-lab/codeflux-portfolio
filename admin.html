@@ -24,25 +24,30 @@
 
       <div>
         <label class="text-xs text-zinc-400 block mb-1">Category / Tag</label>
-        <input id="category" required class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-indigo-500 outline-none" placeholder="e.g. Web Application, Retail" />
+        <input id="category" required class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-indigo-500 outline-none" placeholder="e.g. Web Application" />
       </div>
 
       <div>
-        <label class="text-xs text-zinc-400 block mb-1">Image URL (ImageBB or direct link)</label>
+        <label class="text-xs text-zinc-400 block mb-1">Badge Tag</label>
+        <input id="badge" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-indigo-500 outline-none" placeholder="e.g. Full-Stack / Live App" />
+      </div>
+
+      <div>
+        <label class="text-xs text-zinc-400 block mb-1">Image URL (Optional)</label>
         <input id="image" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-indigo-500 outline-none" placeholder="https://..." />
       </div>
 
       <div>
-        <label class="text-xs text-zinc-400 block mb-1">Live Demo / Website Link</label>
+        <label class="text-xs text-zinc-400 block mb-1">Live Demo Link</label>
         <input id="link" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-indigo-500 outline-none" placeholder="https://..." />
       </div>
 
       <div>
         <label class="text-xs text-zinc-400 block mb-1">Description</label>
-        <textarea id="description" required rows="3" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-indigo-500 outline-none" placeholder="Brief summary of tech stack & features..."></textarea>
+        <textarea id="description" required rows="3" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-indigo-500 outline-none" placeholder="Key features & stack..."></textarea>
       </div>
 
-      <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition text-sm">
+      <button type="submit" id="submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition text-sm">
         Publish Project to Live Site
       </button>
     </form>
@@ -54,7 +59,12 @@
     import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const firebaseConfig = {
-      databaseURL: "https://YOUR-FIREBASE-PROJECT-default-rtdb.firebaseio.com"
+      apiKey: "AIzaSyDW95p_4YPfHo9vvTHwP07fAcrL20UDS7c",
+      authDomain: "codeflux-db.firebaseapp.com",
+      projectId: "codeflux-db",
+      storageBucket: "codeflux-db.firebasestorage.app",
+      messagingSenderId: "113608499003",
+      appId: "1:113608499003:web:e73b527a3a3afe1ec2211e"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -62,9 +72,14 @@
 
     document.getElementById('project-form').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      btn.innerText = "Publishing...";
+      btn.disabled = true;
+
       const newProject = {
         title: document.getElementById('title').value,
         category: document.getElementById('category').value,
+        badge: document.getElementById('badge').value || 'Launch',
         image: document.getElementById('image').value,
         link: document.getElementById('link').value,
         description: document.getElementById('description').value,
@@ -76,7 +91,10 @@
         document.getElementById('status-msg').classList.remove('hidden');
         document.getElementById('project-form').reset();
       } catch (err) {
-        alert("Check Firebase configuration URL");
+        alert("Database error: Make sure Realtime Database is created and set to Test Mode.");
+      } finally {
+        btn.innerText = "Publish Project to Live Site";
+        btn.disabled = false;
       }
     });
   </script>
